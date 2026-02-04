@@ -55,7 +55,7 @@ private:
         // Placeholder for actual interpretation logic
         std::cout << "Running source:\n" << source << "\n";
         Scanner scanner(source);
-        auto t#define EXIT_SUCCESS 0okens = scanner.scanTokens();
+        auto tokens = scanner.scanTokens();
         for (const auto& token : tokens) {
             std::cout << token.toString() << "\n";
         }
