@@ -1,3 +1,4 @@
+#pragma once
 enum class TokenType {
     // Single character
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR, PRECENT,
@@ -12,7 +13,7 @@ enum class TokenType {
     IDENTIFIER, STRING, NUMBER,
 
     // Keywords
-    AND, CLASS, DEF, ELSE, FALSE, FOR, IF, IN, NONE, OR, PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
+    AND, CLASS, DEF, ELSE, FALSE, FOR, IF, IN, INPUT, NONE, OR, PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
 
     EOF_
 };
