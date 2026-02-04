@@ -1,18 +1,13 @@
-enum class TokenType {
-    // Single character
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR, PRECENT,
+#include <any>
+#include <string>
 
-    // One or two character
-    NOT, NOT_EQUAL,
-    EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+class Token {
+public:
+    const TokenType type;
+    const std::string lexeme;
+    const std::any literal;
+    const int line;
 
-    // Literals
-    IDENTIFIER, STRING, NUMBER,
-
-    // Keywords
-    AND, CLASS, DEF, ELSE, FALSE, FOR, IF, IN, NONE, OR, PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
-
-    EOF_
+    Token(TokenType type, const std::string& lexeme, const std::any& literal, int line)
+        : type(type), lexeme(lexeme), literal(literal), line(line) {}
 };
