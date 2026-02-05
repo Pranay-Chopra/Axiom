@@ -170,7 +170,7 @@ void test_identifiers() {
 }
 
 void test_fstrings() {
-    std::string source = R"(f"Hello {name}, you have {count} new messages")";
+    std::string source = R"(f"Hello {name}, you have {count} {{escaped}} new messages")";
     Scanner scanner(source);
     auto tokens = scanner.scanTokens();
 
@@ -190,7 +190,7 @@ void test_fstrings() {
         "name",
         ", you have ",
         "count",
-        " new messages",
+        " {escaped} new messages",
         ""
     };
 
