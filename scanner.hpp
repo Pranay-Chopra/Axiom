@@ -266,7 +266,7 @@ private:
             {"if", TokenType::IF}, {"in", TokenType::IN}, {"input", TokenType::INPUT},
             {"none", TokenType::NONE}, {"or", TokenType::OR}, {"print", TokenType::PRINT},
             {"return", TokenType::RETURN}, {"super", TokenType::SUPER}, {"this", TokenType::THIS},
-            {"true", TokenType::TRUE}, {"while", TokenType::WHILE}
+            {"true", TokenType::TRUE}, {"while", TokenType::WHILE}, {"input", TokenType::INPUT}
         };
 
         auto it = keywords.find(text);

@@ -6,12 +6,39 @@
 #include <cassert>
 #include <any>
 
+std::string tokenTypeToString(TokenType type) {
+    static const std::string strings[] = {
+        "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE", "LEFT_SQUIGGLE", "RIGHT_SQUIGGLE", "COMMA", "COLON", "DOT", "MINUS", "MINUS_MINUS", "PLUS", "PLUS_PLUS",
+        "SEMICOLON", "SLASH", "STAR", "PERCENT", "PLUS_EQUAL", "MINUS_EQUAL", "SLASH_EQUAL", "STAR_EQUAL", "PERCENT_EQUAL",
+
+        // One or two character
+        "NOT", "NOT_EQUAL",
+        "EQUAL", "EQUAL_EQUAL",
+        "GREATER", "GREATER_EQUAL",
+        "LESS", "LESS_EQUAL",
+
+        // Literals
+        "IDENTIFIER", "STRING", "NUMBER",
+
+        // Keywords
+        "AND", "CLASS", "DEF", "ELSE", "FALSE", "FOR", "IF", "IN", "INPUT", "NONE", "OR", "PRINT", "RETURN", "SUPER", "THIS", "TRUE", "WHILE",
+
+        // Indents and newlines
+        "INDENT", "DEDENT", "NEWLINE",
+
+        "FSTRING_EXPR",
+
+        "EOF_"
+    };
+    return strings[static_cast<int>(type)];
+}
+
 void printTokens(const std::vector<Token>& tokens) {
     for (size_t i = 0; i < tokens.size(); ++i) {
         const auto& t = tokens[i];
 
         // Print token index and type
-        std::cout << "[" << i << "] " << static_cast<int>(t.type)
+        std::cout << "[" << i << "] " << tokenTypeToString(t.type)
                   << " : \"" << (t.type == TokenType::EOF_ || t.type == TokenType::NEWLINE ? "" : t.lexeme) << "\"";
 
         // Handle EOF_ explicitly
@@ -151,7 +178,7 @@ void test_string() {
 
 // Test 3: identifier and keywords
 void test_identifiers() {
-    std::string source = "if foo print return true false none";
+    std::string source = "if foo print return true false none input";
     Scanner scanner(source);
     auto tokens = scanner.scanTokens();
 
@@ -159,11 +186,11 @@ void test_identifiers() {
 
     std::vector<TokenType> expectedTypes = {
         TokenType::IF, TokenType::IDENTIFIER, TokenType::PRINT, TokenType::RETURN,
-        TokenType::TRUE, TokenType::FALSE, TokenType::NONE, TokenType::EOF_
+        TokenType::TRUE, TokenType::FALSE, TokenType::NONE, TokenType::INPUT, TokenType::EOF_
     };
 
     std::vector<std::string> expectedLexemes = {
-        "if", "foo", "print", "return", "true", "false", "none", ""
+        "if", "foo", "print", "return", "true", "false", "none", "input", ""
     };
 
     assert(tokens.size() == expectedTypes.size());
