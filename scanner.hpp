@@ -154,10 +154,19 @@ private:
         std::string literal;
         while (!isAtEnd()) {
             char c = advance();
+
             if (c == '"') {
                 if (!literal.empty()) addToken(TokenType::STRING, literal);
                 return;
-            } else if (c == '{') {
+            }
+
+            // Handle escaped {{
+            else if (c == '{' && peek() == '{') {
+                literal += advance(); // Consume the second '{'
+            }
+
+            // Handle start of expression
+            else if (c == '{') {
                 if (!literal.empty()) {
                     addToken(TokenType::STRING, literal);
                     literal.clear();
@@ -170,10 +179,24 @@ private:
                     if (ch == '{') braceDepth++;
                     else if (ch == '}') braceDepth--;
                 }
+
+                if (braceDepth > 0) {
+                    error(line, "Unterminated expression in f-string.", source, start, current);
+                    return;
+                }
+
                 int exprEnd = current - 1;
                 std::string exprText = source.substr(exprStart, exprEnd - exprStart);
                 addToken(TokenType::FSTRING_EXPR, exprText);
-            } else {
+            }
+
+            // Handle escaped }}
+            else if (c == '}' && peek() == '}') {
+                literal += advance(); // Consume the second '}'
+            }
+
+            // Normal characters
+            else {
                 literal += c;
             }
         }
