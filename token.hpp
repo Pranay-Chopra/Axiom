@@ -26,7 +26,7 @@ public:
                 case TokenType::SEMICOLON: return "SEMICOLON";
                 case TokenType::SLASH: return "SLASH";
                 case TokenType::STAR: return "STAR";
-                case TokenType::PRECENT: return "PRECENT";
+                case TokenType::PERCENT: return "PRECENT";
                 case TokenType::NOT: return "NOT";
                 case TokenType::NOT_EQUAL: return "NOT_EQUAL";
                 case TokenType::EQUAL: return "EQUAL";
@@ -56,12 +56,25 @@ public:
                 case TokenType::TRUE: return "TRUE";
                 case TokenType::WHILE: return "WHILE";
                 case TokenType::EOF_: return "EOF_";
+                case TokenType::LEFT_SQUIGGLE: return "LEFT_SQUIGGLE";
+                case TokenType::RIGHT_SQUIGGLE: return "RIGHT_SQUIGGLE";
+                case TokenType::INDENT: return "INDENT";
+                case TokenType::DEDENT: return "DEDENT";
+                case TokenType::NEWLINE: return "NEWLINE";
+                case TokenType::MINUS_MINUS: return "MINUS_MINUS";
+                case TokenType::PLUS_PLUS: return "PLUS_PLUS";
+                case TokenType::PLUS_EQUAL: return "PLUS_EQUAL";
+                case TokenType::MINUS_EQUAL: return "MINUS_EQUAL";
+                case TokenType::SLASH_EQUAL: return "SLASH_EQUAL";
+                case TokenType::STAR_EQUAL: return "STAR_EQUAL";
+                case TokenType::PERCENT_EQUAL: return "PERCENT_EQUAL";
+                case TokenType::FSTRING_EXPR: return "FSTRING_EXPR";
                 default: return "UNKNOWN";
             }
         }
 
         std::string literalToString() const {
-            if (!literal.has_value()) return "nil";
+            if (!literal.has_value()) return "None";
 
             if (literal.type() == typeid(double))
                 return std::to_string(std::any_cast<double>(literal));
