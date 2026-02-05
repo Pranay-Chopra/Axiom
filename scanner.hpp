@@ -44,11 +44,18 @@ private:
     bool match(char expected) { if (peek() != expected) return false; current++; return true; }
 
     void scanToken() {
+        char c = peek();
+        if ((c == 'f' || c == 'F') && peekNext() == '"') {
+            advance(); // consume f/F
+            advance(); // consume opening "
+            fString();
+            return;
+        }
         if (atLineStart) handleIndentation();
         if (isAtEnd()) return;
 
         start = current;  // mark start for this token
-        char c = advance();
+        c = advance();
 
         // Helper lambda for two-character operators
         auto twoChar = [&](char expected, TokenType typeIfMatch, TokenType typeSingle) {
@@ -143,6 +150,40 @@ private:
         atLineStart = false;
     }
 
+    void fString() {
+        std::string literal;
+        while (!isAtEnd()) {
+            char c = advance();
+            if (c == '"') {
+                if (!literal.empty()) addToken(TokenType::STRING, literal);
+                return;
+            } else if (c == '{') {
+                if (!literal.empty()) {
+                    addToken(TokenType::STRING, literal);
+                    literal.clear();
+                }
+
+                int exprStart = current;
+                int braceDepth = 1;
+                while (!isAtEnd() && braceDepth > 0) {
+                    char ch = advance();
+                    if (ch == '{') braceDepth++;
+                    else if (ch == '}') braceDepth--;
+                }
+                int exprEnd = current - 1;
+                std::string exprText = source.substr(exprStart, exprEnd - exprStart);
+                addToken(TokenType::FSTRING_EXPR, exprText);
+            } else {
+                literal += c;
+            }
+        }
+        error(line, "Unterminated f-string.", source, start, current);
+    }
+
+
+
+
+
 
     void string() {
         std::string value;
@@ -204,10 +245,16 @@ private:
     void addToken(TokenType type) { addToken(type, std::any{}); }
     void addToken(TokenType type, const std::any& literal) {
         std::string lex = source.substr(start, current - start);
-        if (type == TokenType::STRING && literal.has_value()) {
-            // remove quotes for lexeme
-            lex = std::any_cast<std::string>(literal);
+
+        // Check for both STRING and FSTRING_EXPR to override the lexeme
+        if ((type == TokenType::STRING || type == TokenType::FSTRING_EXPR) && literal.has_value()) {
+            try {
+                lex = std::any_cast<std::string>(literal);
+            } catch (const std::bad_any_cast& e) {
+                // Fallback or handle non-string literals (like numbers) if necessary
+            }
         }
+
         tokens.emplace_back(type, lex, literal, line);
     }
 
