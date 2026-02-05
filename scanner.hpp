@@ -81,7 +81,14 @@ private:
             case ' ':
             case '\r':
             case '\t': break; // skip whitespace
-            case '\n': addToken(TokenType::NEWLINE); line++; atLineStart = true; break;
+            case '\n':
+                if (!atLineStart) {
+                    // We only emit a token if the line wasn't empty/just comments
+                    addToken(TokenType::NEWLINE);
+                }
+                line++;
+                atLineStart = true; // Reset for the next line
+                break;
 
             // Operators (two-char handled consistently)
             case '!': twoChar('=', TokenType::NOT_EQUAL, TokenType::NOT); break;
@@ -100,10 +107,14 @@ private:
                 break;
             case '*': twoChar('=', TokenType::STAR_EQUAL, TokenType::STAR); break;
             case '/':
-                if (peek() == '/') {
-                    advance(); // consume second '/'
-                    while (!isAtEnd() && peek() != '\n') advance(); // skip comment
-                } else twoChar('=', TokenType::SLASH_EQUAL, TokenType::SLASH);
+                if (match('/')) {
+                    // Consume everything until the newline
+                    while (peek() != '\n' && !isAtEnd()) advance();
+                    // Do NOT consume the \n here.
+                    // Let the 'case \n' handle it so 'atLineStart' logic stays consistent.
+                } else {
+                    twoChar('=', TokenType::SLASH_EQUAL, TokenType::SLASH);
+                }
                 break;
             case '%': twoChar('=', TokenType::PERCENT_EQUAL, TokenType::PERCENT); break;
 
@@ -119,15 +130,16 @@ private:
 
 
     void handleIndentation() {
-        if (isAtEnd()) return;
-
         int indent = 0;
-        while (peek() == ' ') { advance(); indent++; }
+        while (peek() == ' ' || peek() == '\t') {
+            if (peek() == '\t') indent += 4; // Or your preferred tab width
+            else indent++;
+            advance();
+        }
 
-        // Blank line or comment-only line
-        if (peek() == '\n' || peek() == '\0' || (peek() == '/' && peekNext() == '/')) {
-            atLineStart = false;
-            return; // ignore indentation on empty/comment line
+        // If the line is empty or just a comment, don't emit INDENT/DEDENT
+        if (peek() == '\n' || peek() == '\r' || (peek() == '/' && peekNext() == '/')) {
+            return;
         }
 
         int currentIndent = indentLevels.back();
@@ -140,13 +152,10 @@ private:
                 indentLevels.pop_back();
                 addToken(TokenType::DEDENT);
             }
-
-            // Only error if indentation is not a known level
             if (indent != indentLevels.back()) {
-                error(line, "Bad Indentation.", source, start, current);
+                error(line, "Inconsistent indentation.", source, start, current);
             }
         }
-
         atLineStart = false;
     }
 

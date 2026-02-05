@@ -12,11 +12,14 @@ void printTokens(const std::vector<Token>& tokens) {
 
         // Print token index and type
         std::cout << "[" << i << "] " << static_cast<int>(t.type)
-                  << " : \"" << t.lexeme << "\"";
+                  << " : \"" << (t.type == TokenType::EOF_ || t.type == TokenType::NEWLINE ? "" : t.lexeme) << "\"";
 
         // Handle EOF_ explicitly
         if (t.type == TokenType::EOF_) {
             std::cout << " (EOF)";
+        }
+        else if (t.type == TokenType::NEWLINE) {
+            std::cout << " (NEWLINE)";
         }
         // Print literal if it exists
         else if (t.literal.has_value()) {
@@ -68,6 +71,7 @@ a = 5
 b != 3
 c += 2
 d /= 4
+// hello
 )";
 
     Scanner scanner(source);
@@ -77,7 +81,7 @@ d /= 4
 
     // Expected token types in the same order the scanner emits
     std::vector<TokenType> expectedTypes = {
-        TokenType::NEWLINE,           // first empty line
+        // TokenType::NEWLINE,           // first empty line
         TokenType::IDENTIFIER,        // a
         TokenType::EQUAL,             // =
         TokenType::NUMBER,            // 5
@@ -99,7 +103,7 @@ d /= 4
 
     // Lexemes expected
     std::vector<std::string> expectedLexemes = {
-        "\n",
+        // "\n",
         "a", "=", "5", "\n",
         "b", "!=", "3", "\n",
         "c", "+=", "2", "\n",
@@ -127,6 +131,7 @@ d /= 4
         assert(tokens[i].type == expectedTypes[i]);
         assert(tokens[i].lexeme == expectedLexemes[i]);
     }
+    std::cout << "test_basic passed!\n";
 }
 
 
